@@ -1,0 +1,499 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  color: white;
+}
+
+/* Screens */
+.screen {
+  display: none;
+  width: 1024px;
+  height: 768px;
+  position: relative;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* Login Screen */
+#login-screen {
+  background-color: #37333f;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+#logo-container {
+  margin-bottom: 40px;
+}
+
+#otv-logo {
+  width: 300px;
+  /* Rough estimate, adjust as needed */
+  transition: opacity 0.5s ease;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 300px;
+  transition: opacity 0.5s ease;
+}
+
+#login-form input {
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #1e1e1e;
+  background: #231f20;
+  color: white;
+  font-size: 16px;
+  outline: none;
+}
+
+#login-form input:focus {
+  border-color: #00adee;
+}
+
+#login-form button {
+  padding: 12px;
+  background: #00adee;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#login-form button:hover {
+  background: #0081b3;
+}
+
+#login-error {
+  color: #e53935;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+#entering-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#entering-animation img {
+  width: 612.42px;
+  height: 199.4px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Main Application Screen */
+#app-screen {
+  flex-direction: column;
+  background-color: transparent;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  width: 1024px;
+  height: 768px;
+  position: relative;
+}
+
+/* Control Panel */
+#control-panel {
+  width: 324px;
+  height: 768px;
+  background-color: #37333f;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 40px;
+}
+
+/* Device Panel */
+#device-panel {
+  width: 700px;
+  height: 768px;
+  background-color: #231f20;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Device Panel Statics */
+.static-bg {
+  position: absolute;
+}
+
+#movement-grid {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 442.26px;
+  height: 602.98px;
+}
+
+#hub {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 130.88px;
+  height: 130.89px;
+  z-index: 90;
+}
+
+#tape-deck {
+  top: 50%;
+  right: -150px;
+  /* -150px from edge */
+  transform: translateY(-50%);
+  width: 600px;
+  height: 600px;
+}
+
+/* Arm Container */
+#arm-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  z-index: 10;
+}
+
+.arm-part {
+  position: absolute;
+  transform-origin: center center;
+}
+
+/* Fault overlay */
+#arm-fault {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  width: 600px;
+  height: 600px;
+}
+
+.flash {
+  animation: flashAnim 0.25s infinite alternate;
+}
+
+@keyframes flashAnim {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Cassette Queue Overlay */
+#cassette-queue {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 1024px;
+  height: 100px;
+  background: transparent;
+  z-index: 500;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.cassette-slot {
+  width: 109.93px;
+  height: 56.13px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cassette-img {
+  width: 100%;
+  height: 100%;
+}
+
+.svg-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+.selected-wrapper {
+  transform: rotate(180deg);
+}
+
+.cassette-number {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #37333f;
+  font-weight: bold;
+  font-size: 24px;
+  pointer-events: none;
+}
+
+.cassette-tooltip {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #37333f;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+  /* Rotate inverted text back if tooltip somehow bound to moving layer, though here it's directly on the slot wrapper */
+}
+
+.cassette-slot.selected .cassette-tooltip {
+  opacity: 1;
+}
+
+.control-btn {
+  width: 164.3px;
+  height: 138.22px;
+  margin-top: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+.control-btn img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Complex Layered Button */
+.complex-btn {
+  width: 208.3px;
+  height: 182.22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.complex-btn img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Override general control-btn img size for perfect internal aspect ratio stacking */
+}
+
+.complex-btn .btn-bg,
+.complex-btn .btn-frame {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* The UP/DOWN SVGs are natively 164.3x138.22, 
+   Frame is natively 208.3x182.22. 
+   Ratio constraint for precise stacking: */
+.complex-btn .btn-up,
+.complex-btn .btn-down {
+  width: 78.87%;
+  height: 75.85%;
+  object-fit: contain;
+  z-index: 5;
+}
+
+.complex-btn .btn-bg {
+  z-index: 1;
+}
+
+/* Pulsating Fade Animation while action is running */
+.anim-active .btn-up,
+.anim-active .btn-down {
+  display: block !important;
+}
+
+.anim-active .btn-up {
+  animation: swapFade1 0.8s infinite alternate ease-in-out;
+}
+
+.anim-active .btn-down {
+  animation: swapFade2 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes swapFade1 {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes swapFade2 {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Arm and Cassette Animations */
+#arm-rotator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0px;
+  height: 0px;
+  transition: transform 3s ease-in-out;
+}
+
+.rot-0 {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.rot-180 {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+/* Ensure absolute centering for all arm parts */
+.arm-part {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Add base dimensions if needed */
+  width: 600px;
+  /* Allow vertical translation using translate in css classes added by JS */
+}
+
+/* Base button states */
+
+
+/* Tape Deck size override */
+#tape-deck {
+  top: 50%;
+  right: 0px;
+  transform: translateY(calc(-50% - 520px));
+  width: 600px;
+  height: 600px;
+}
+
+#arm-rotator img {
+  left: 50%;
+  top: 50%;
+}
+
+#arm-container {
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%);
+}
+
+/* App is fixed scale */
+body {
+  background-color: #000;
+}
+
+#login-screen,
+#app-screen {
+  width: 1024px;
+  height: 768px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+#control-panel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 324px;
+  height: 768px;
+  background: #37333f;
+  z-index: 10;
+}
+
+#device-panel {
+  position: absolute;
+  left: 324px;
+  top: 0;
+  width: 700px;
+  height: 768px;
+  background: #231f20;
+}
+
+
+
+/* Let's clean up layout a bit */
+.app-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Role-based access control */
+body[data-role="operator"] #btn-play,
+body[data-role="operator"] #btn-pause,
+body[data-role="operator"] #btn-stop {
+  display: none;
+}
+
+body[data-role="operator"] #control-panel {
+  justify-content: center;
+  gap: 15px;
+  padding-top: 0;
+}
+
+.user-mode-logo {
+  display: none;
+  object-fit: contain;
+}
+
+#control-panel > img[src*="OTV logo.svg"] {
+  width: 124.15px;
+  height: 133.58px;
+  margin-top: -175px;
+}
+
+#control-panel > img[src*="APRS.svg"] {
+  width: 182.5px;
+  height: 131.52px;
+}
+
+body[data-role="operator"] .user-mode-logo {
+  display: block;
+}
