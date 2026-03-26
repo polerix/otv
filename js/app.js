@@ -10,7 +10,7 @@ const COLOR_MAPPING = {
 
 const cassettes = [
     { id: 0, label: 'Die Hard', status: 'idle' },
-    { id: 1, label: 'OTV Station ID', status: 'active' }, // One must be active
+    { id: 1, label: 'otv Station ID', status: 'active' }, // One must be active
     { id: 2, label: 'Robocop', status: 'cued' },
     { id: 3, label: 'Lethal Weapon 2', status: 'idle' },
     { id: 4, label: 'Toy R Us Commercial', status: 'ad' },
@@ -21,6 +21,21 @@ const cassettes = [
 
 let selectedIndex = 0;
 
+const CASSETTE_SVG = `<svg class="cassette-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 109.93 56.13">
+  <defs>
+    <style>
+      .cls-1 { fill: #999590; }
+      .cls-2 { fill: #787672; }
+      .cls-3 { fill: #a7a39d; }
+    </style>
+  </defs>
+  <g>
+    <path class="cls-2" d="M109.93,54.13v-8.92H0v8.92c0,1.1.9,2,2,2h105.93c1.1,0,2-.9,2-2Z"/>
+    <path class="cls-1" d="M109.93,48.67V2c0-1.1-.9-2-2-2H2C.9,0,0,.9,0,2v46.67c0,1.1.9,2,2,2h105.93c1.1,0,2-.9,2-2ZM31.26,13.93h47c6.3,0,11.72,4.93,11.82,11.22s-5.05,11.6-11.41,11.6H31.67c-6.3,0-11.72-4.93-11.82-11.22s5.05-11.6,11.41-11.6Z"/>
+    <path class="cls-3" d="M107.93,1.5c.28,0,.5.22.5.5v46.67c0,.28-.22.5-.5.5H2c-.28,0-.5-.22-.5-.5V2c0-.28.22-.5.5-.5h105.93ZM78.67,38.25c3.49,0,6.75-1.37,9.2-3.86,2.45-2.49,3.76-5.78,3.71-9.26-.11-7-6.09-12.7-13.32-12.7H31.26c-3.49,0-6.75,1.37-9.2,3.86-2.45,2.49-3.76,5.78-3.71,9.26.11,7,6.09,12.7,13.32,12.7h47Z"/>
+    <path class="cls-2" d="M31.26,36.75h47.41c6.3,0,11.41-5.11,11.41-11.41s-5.11-11.41-11.41-11.41H31.26c-6.3,0-11.41,5.11-11.41,11.41s5.11,11.41,11.41,11.41ZM81.19,17.34c4.42,0,8,3.58,8,8s-3.58,8-8,8-8-3.58-8-8,3.58-8,8-8ZM37.63,22.34h34.67v6h-34.67v-6ZM28.74,17.34c4.42,0,8,3.58,8,8s-3.58,8-8,8-8-3.58-8-8,3.59-8,8-8Z"/>
+  </g>
+</svg>`;
 
 // ==== Initialization ====
 document.addEventListener('DOMContentLoaded', () => {
@@ -28,7 +43,17 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCassettes();
     setupKeyboardNavigation();
     setupControls();
+    setupResize();
 });
+
+function setupResize() {
+    function resizeApp() {
+        const scale = Math.min(window.innerWidth / 1024, window.innerHeight / 768);
+        document.documentElement.style.setProperty('--app-scale', scale);
+    }
+    window.addEventListener('resize', resizeApp);
+    resizeApp();
+}
 
 
 // ==== Login Logic ====
@@ -78,7 +103,24 @@ function renderCassettes() {
     const queue = document.getElementById('cassette-queue');
     queue.innerHTML = '';
 
-    cassettes.forEach((cassette, index) => {
+    const slotWidth = 109.93;
+    const gap = 20;
+
+    // We want the selected cassette to appear at the 6th position (index 5)
+    // so that the entire array of 8 fits perfectly centered on the screen when aligned to the claw.
+    
+    // Total count is 8.
+    const centerOffset = 5; // By putting the selected at position 5 (0-indexed), positions 0-4 are to the left, 6-7 to the right.
+    
+    let displayIndices = [];
+    for (let i = -centerOffset; i < CASSETTES_COUNT - centerOffset; i++) {
+        let index = (selectedIndex + i) % CASSETTES_COUNT;
+        if (index < 0) index += CASSETTES_COUNT;
+        displayIndices.push(index);
+    }
+
+    displayIndices.forEach((index, positionInQueue) => {
+        const cassette = cassettes[index];
         const slot = document.createElement('div');
         slot.className = `cassette-slot ${index === selectedIndex ? 'selected' : ''}`;
         slot.dataset.index = index;
@@ -91,29 +133,62 @@ function renderCassettes() {
         overlayText.className = 'cassette-number';
         overlayText.innerText = index + 1;
 
-        const file = index === selectedIndex ? 'TapeCassette_selected.svg' : 'TapeCassette.svg';
+        const wrapper = document.createElement('div');
+        wrapper.className = `svg-wrapper ${index === selectedIndex ? 'selected-wrapper' : ''}`;
+        wrapper.innerHTML = CASSETTE_SVG;
 
-        // Inline SVG fetching
-        fetch(`ARPS/SVG/${file}`)
-            .then(res => res.text())
-            .then(svgData => {
-                const wrapper = document.createElement('div');
-                wrapper.className = `svg-wrapper ${index === selectedIndex ? 'selected-wrapper' : ''}`;
-                wrapper.innerHTML = svgData;
-                const svg = wrapper.querySelector('svg');
-                svg.classList.add('cassette-img');
+        const baseFill = wrapper.querySelector('.cls-1');
+        const baseColor = COLOR_MAPPING[cassette.status] || COLOR_MAPPING['idle'];
+        if (baseFill) {
+            baseFill.style.fill = baseColor;
+        }
 
-                const baseFill = wrapper.querySelector('.cls-1');
-                if (baseFill) {
-                    baseFill.style.fill = COLOR_MAPPING[cassette.status] || COLOR_MAPPING['idle'];
-                }
+        overlayText.style.color = '#37333f';
+        overlayText.style.textShadow = `-2px -2px 0 ${baseColor}, 2px -2px 0 ${baseColor}, -2px 2px 0 ${baseColor}, 2px 2px 0 ${baseColor}`;
 
-                wrapper.appendChild(overlayText);
-                slot.appendChild(wrapper);
-                slot.appendChild(tooltip);
-            });
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-container';
+        
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        if (cassette.status === 'playing') {
+            // Start a CSS animation
+            progressBar.style.backgroundColor = baseColor;
+            progressBar.style.animation = 'playProgress 10s linear forwards';
+        }
+        progressContainer.appendChild(progressBar);
+
+        slot.appendChild(wrapper);
+        slot.appendChild(progressContainer);
+        slot.appendChild(overlayText);
+        slot.appendChild(tooltip);
+        
         queue.appendChild(slot);
     });
+
+    const clawX = 674; // 324px (left panel width) + 350px (half of right panel width)
+    
+    // The "selected" cassette is exactly at position centerOffset.
+    const selectedPosition = centerOffset;
+    const selectedCenter = selectedPosition * (slotWidth + gap) + (slotWidth / 2);
+    
+    // Calculate if we need to scale the queue to fit all 8 cassettes on screen
+    const totalQueueWidth = CASSETTES_COUNT * slotWidth + (CASSETTES_COUNT - 1) * gap;
+    // We want the left edge (0) to right edge (totalQueueWidth) to fit within 1024px.
+    // However, it's pinned to the clawX (674px). The left side is selectedCenter. 
+    // The right side is totalQueueWidth - selectedCenter.
+    // Left available: 674px. Right available: 1024 - 674 = 350px.
+    // Since selectedCenter is position 5 (offset 5), 5.5 slots are on the left (~700px), 2.5 on right (~320px).
+    // So it will overflow the left side (700 > 674). 
+    // Let's compute a scale factor to force the large side to fit:
+    const leftScale = 674 / selectedCenter;
+    const rightScale = 350 / (totalQueueWidth - selectedCenter);
+    const queueScale = Math.min(1, leftScale, rightScale) * 0.95; // 0.95 gives a little padding
+    
+    const translateX = clawX - (selectedCenter * queueScale);
+    
+    queue.style.transform = `translateX(${translateX}px) scale(${queueScale})`;
+    queue.style.transformOrigin = 'left bottom';
 }
 
 function setupKeyboardNavigation() {
@@ -166,6 +241,14 @@ function setupControls() {
 
     setupButton('btn-swap', () => {
         if (isAnimating) return;
+        
+        const cassette = cassettes[selectedIndex];
+        if (document.body.dataset.role === 'operator' && cassette.status === 'playing') {
+            // Show error indicator (e.g. flashing fault) and block swap
+            triggerFault();
+            return;
+        }
+        
         runSwapSequence();
     });
 }
@@ -200,23 +283,24 @@ let isAnimating = false;
 async function runSwapSequence() {
     isAnimating = true;
 
+    // Elements mapped by arm rotation angle group
     const els = {
-        retractedOpen0: document.getElementById('arm-retracted-open-0'),
-        retractedOpen180: document.getElementById('arm-retracted-open-180'),
-        extendedOpen0: document.getElementById('arm-extended-open-0'),
-        extendedClosed0: document.getElementById('arm-extended-closed-0'),
-        extendedOpen180: document.getElementById('arm-extended-open-180'),
-        extendedClosed180: document.getElementById('arm-extended-closed-180'),
-        pick0: document.getElementById('tape-cassette-pick-0'),
-        pick180: document.getElementById('tape-cassette-pick-180'),
+        0: {
+            retractedOpen: document.getElementById('arm-retracted-open-0'),
+            extendedOpen: document.getElementById('arm-extended-open-0'),
+            extendedClosed: document.getElementById('arm-extended-closed-0'),
+            pick: document.getElementById('tape-cassette-pick-0')
+        },
+        180: {
+            retractedOpen: document.getElementById('arm-retracted-open-180'),
+            extendedOpen: document.getElementById('arm-extended-open-180'),
+            extendedClosed: document.getElementById('arm-extended-closed-180'),
+            pick: document.getElementById('tape-cassette-pick-180')
+        },
         rotator: document.getElementById('arm-rotator')
     };
 
     const btnSwap = document.getElementById('btn-swap');
-    const swapUp = btnSwap.querySelector('.btn-up');
-    const swapDown = btnSwap.querySelector('.btn-down');
-
-    // CSS-driven pulse animation
     btnSwap.classList.add('anim-active');
 
     // Make sure we are at baseline before start
@@ -225,63 +309,84 @@ async function runSwapSequence() {
     await delay(50);
     els.rotator.style.transition = 'transform 3s ease-in-out';
 
-    // --- PICK ---
-    els.retractedOpen0.classList.remove('hidden');
-    els.retractedOpen180.classList.remove('hidden');
-    await delay(500);
-    els.retractedOpen0.classList.add('hidden');
-    els.extendedOpen0.classList.remove('hidden');
-    await delay(1000);
-    els.pick0.classList.remove('hidden');
-    await delay(250);
-    els.extendedOpen0.classList.add('hidden');
-    els.extendedClosed0.classList.remove('hidden');
-    els.pick0.style.transform = 'translate(-50%, calc(-50% - 100px)) rotate(0deg)';
-    els.pick0.style.transition = 'transform 0.5s ease-in-out';
+    // Helper to asynchronously animate a single arm grabbing a tape
+    async function pickTape(arm) {
+        arm.retractedOpen.classList.add('hidden');
+        arm.extendedOpen.classList.remove('hidden');
+        
+        await delay(1000); // Time to extend
+        
+        arm.pick.classList.remove('hidden');
+        
+        await delay(250); // Pause briefly before closing
+        
+        arm.extendedOpen.classList.add('hidden');
+        arm.extendedClosed.classList.remove('hidden');
+        
+        // Retract while holding the tape
+        arm.pick.style.transform = 'translate(0, -100px)'; // 100px relative translation upwards to hub center
+        arm.pick.style.transition = 'transform 0.5s ease-in-out';
+        
+        await delay(500); // Time to retract
+    }
 
+    // Helper to asynchronously animate a single arm placing a tape
+    async function placeTape(arm) {
+        // Start from retracted closed position (which is conceptually ExtendedClosed hidden state reversed)
+        // Wait, physically placing involves pushing it OUT to the 100px extreme
+        
+        // Push tape out
+        arm.pick.style.transform = 'translate(0, 0px)'; // reset to original SVG bounds (extended)
+        arm.pick.style.transition = 'transform 0.25s ease-in-out';
+        await delay(250);
+        
+        // Open the claw
+        arm.extendedClosed.classList.add('hidden');
+        arm.extendedOpen.classList.remove('hidden');
+        
+        await delay(250); // Short pause to let tape go
+        
+        arm.pick.classList.add('hidden'); // Tape is dropped in player/library
+        
+        await delay(1000); // Time to retract empty arm
+        
+        arm.extendedOpen.classList.add('hidden');
+        arm.retractedOpen.classList.remove('hidden');
+    }
+
+    // --- 1. BOTH ARMS EXTEND AND PICK SIMULTANEOUSLY ---
+    // Make sure both are visible in open retracted state first
+    els[0].retractedOpen.classList.remove('hidden');
+    els[180].retractedOpen.classList.remove('hidden');
     await delay(500);
 
-    // --- ROTATE ---
+    await Promise.all([
+        pickTape(els[0]),
+        pickTape(els[180])
+    ]);
+
+    // --- 2. ROTATE HUB WITH BOTH TAPES ---
     els.rotator.style.transform = 'translate(-50%, -50%) rotate(180deg)';
     await delay(3000);
 
-    // Reset visual mapping since physical rotation happened 180
+    // After physical rotation, reset visual mapping since 180 is now at 0's spot
     els.rotator.style.transition = 'none';
     els.rotator.style.transform = 'translate(-50%, -50%) rotate(0deg)';
+    
+    // Swap the class visibilities instantly because the hub flipped back to 0 mathematically
+    // but the tapes and arms need to physically trade places in the DOM
+    [els[0].extendedClosed.className, els[180].extendedClosed.className] = [els[180].extendedClosed.className, els[0].extendedClosed.className];
+    [els[0].pick.className, els[180].pick.className] = [els[180].pick.className, els[0].pick.className];
+    // Also reset any lingering internal translation states so the swap is clean
+    [els[0].pick.style.transform, els[180].pick.style.transform] = [els[180].pick.style.transform, els[0].pick.style.transform];
+    
 
-    els.extendedClosed0.classList.add('hidden');
-    els.pick0.classList.add('hidden');
-    els.pick0.style.transition = 'none';
-    els.pick0.style.transform = 'translate(-50%, -50%) rotate(0deg)';
-
-    // --- PLACE ---
-    els.pick180.style.transform = 'translate(-50%, calc(-50% + 100px)) rotate(180deg)';
-    els.pick180.classList.remove('hidden');
-
-    els.extendedOpen0.classList.remove('hidden');
-    els.extendedClosed180.classList.remove('hidden');
-
-    els.rotator.style.transition = 'transform 3s ease-in-out';
-    els.pick180.style.transition = 'transform 0.25s ease-in-out';
-    await delay(250);
-
-    els.pick180.style.transform = 'translate(-50%, -50%) rotate(180deg)';
-
-    await delay(1000);
-
-    await delay(250);
-
-    els.pick180.classList.add('hidden');
-
-    await delay(500);
-
-    els.extendedOpen0.classList.add('hidden');
-    els.extendedClosed180.classList.add('hidden');
-
-    els.retractedOpen0.classList.remove('hidden');
-    // retractedOpen180 is already shown
+    // --- 3. BOTH ARMS PLACE SIMULTANEOUSLY ---
+    await Promise.all([
+        placeTape(els[0]),
+        placeTape(els[180])
+    ]);
 
     btnSwap.classList.remove('anim-active');
-
     isAnimating = false;
 }

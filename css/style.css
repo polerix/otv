@@ -127,21 +127,29 @@ body {
   width: 324px;
   height: 768px;
   background-color: #37333f;
-  position: relative;
-  z-index: 5;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 40px;
+  justify-content: space-evenly;
+  padding-bottom: 100px; /* leaves room for the 100px cassette queue */
+  box-sizing: border-box;
 }
 
-/* Device Panel */
+/* Device Panel (Right) */
 #device-panel {
-  width: 700px;
-  height: 768px;
-  background-color: #231f20;
-  position: relative;
+  flex: 1;
+  position: relative; /* Keep relative for child absolute positioning */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  /* Shift entire grid + arm system mathematically down to meet cassette tape */
+  transform: translateY(122px); /* 500 center - 378 target = 122px offset */
 }
 
 /* Device Panel Statics */
@@ -168,9 +176,8 @@ body {
 
 #tape-deck {
   top: 50%;
-  right: -150px;
-  /* -150px from edge */
-  transform: translateY(-50%);
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 600px;
   height: 600px;
 }
@@ -180,8 +187,9 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 0;
-  height: 0;
+  width: 600px;
+  height: 600px;
+  transform: translate(-50%, -50%);
   z-index: 10;
 }
 
@@ -220,15 +228,17 @@ body {
   position: absolute;
   bottom: 0px;
   left: 0;
-  width: 1024px;
-  height: 100px;
+  width: max-content;
+  height: 200px;
   background: transparent;
   z-index: 500;
   display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0 20px;
+  justify-content: flex-start;
+  align-items: flex-end; /* Align to bottom so they can pop up */
+  gap: 20px;
+  padding: 0 0 40px 0; /* padding bottom instead of center */
   box-sizing: border-box;
+  transition: transform 0.5s ease-in-out;
 }
 
 .cassette-slot {
@@ -252,8 +262,37 @@ body {
   transition: transform 0.3s ease;
 }
 
+/* Base selected wrapper rotation doesn't pop up directly, the slot does */
 .selected-wrapper {
   transform: rotate(180deg);
+}
+
+.cassette-slot.selected {
+  transform: translateY(-50px);
+}
+
+.progress-container {
+  position: absolute;
+  bottom: -4px; /* below the wrapper but relative to slot */
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+/* Because selected is rotated 180, bottom becomes top visually for the cassette,
+   but we attach progress bar to the slot so it stays at the bottom edge globally */
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #fff;
+}
+
+@keyframes playProgress {
+  0% { width: 0%; }
+  100% { width: 100%; }
 }
 
 .cassette-number {
@@ -291,7 +330,6 @@ body {
 .control-btn {
   width: 164.3px;
   height: 138.22px;
-  margin-top: 20px;
   cursor: pointer;
   position: relative;
 }
@@ -389,36 +427,28 @@ body {
 }
 
 /* Ensure absolute centering for all arm parts */
+.arm-side {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  top: 0;
+  left: 0;
+}
+
 .arm-part {
   position: absolute;
   top: 0;
   left: 0;
-  /* Add base dimensions if needed */
   width: 600px;
-  /* Allow vertical translation using translate in css classes added by JS */
+  height: 600px;
 }
 
 /* Base button states */
 
 
-/* Tape Deck size override */
-#tape-deck {
-  top: 50%;
-  right: 0px;
-  transform: translateY(calc(-50% - 520px));
-  width: 600px;
-  height: 600px;
-}
-
 #arm-rotator img {
   left: 50%;
   top: 50%;
-}
-
-#arm-container {
-  width: 600px;
-  height: 600px;
-  transform: translate(-50%, -50%);
 }
 
 /* App is fixed scale */
@@ -433,19 +463,11 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(var(--app-scale, 1));
   overflow: hidden;
 }
 
-#control-panel {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 324px;
-  height: 768px;
-  background: #37333f;
-  z-index: 10;
-}
+/* Removed absolute #control-panel position since we combined it earlier */
 
 #device-panel {
   position: absolute;
@@ -472,21 +494,14 @@ body[data-role="operator"] #btn-stop {
   display: none;
 }
 
-body[data-role="operator"] #control-panel {
-  justify-content: center;
-  gap: 15px;
-  padding-top: 0;
-}
-
 .user-mode-logo {
   display: none;
   object-fit: contain;
 }
 
-#control-panel > img[src*="OTV logo.svg"] {
+#control-panel > img[src*="otv logo.svg"] {
   width: 124.15px;
   height: 133.58px;
-  margin-top: -175px;
 }
 
 #control-panel > img[src*="APRS.svg"] {

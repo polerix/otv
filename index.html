@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OTV - ARPS Video Cassette Player Control</title>
+    <title>otv - ARPS Video Cassette Player Control</title>
     <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 
@@ -14,8 +14,8 @@
     <div id="login-screen" class="screen active">
         <div class="login-container">
             <div id="logo-container">
-                <!-- OTV logo injected via CSS background or img tag -->
-                <img src="ARPS/SVG/OTV logo.svg" alt="OTV Logo" id="otv-logo">
+                <!-- otv logo injected via CSS background or img tag -->
+                <img src="ARPS/SVG/otv logo.svg" alt="otv Logo" id="otv-logo">
             </div>
 
             <!-- Login Form -->
@@ -39,7 +39,7 @@
 
             <!-- Control Panel (Left) -->
             <div id="control-panel">
-                <img src="ARPS/SVG/OTV logo.svg" class="user-mode-logo" alt="OTV Logo">
+                <img src="ARPS/SVG/otv logo.svg" class="user-mode-logo" alt="otv Logo">
                 <img src="ARPS/SVG/APRS.svg" class="user-mode-logo" alt="ARPS Logo">
                 <div class="control-btn complex-btn" id="btn-swap">
                     <!-- absolute children controlled via native scale CSS -->
@@ -73,25 +73,18 @@
 
                 <div id="arm-container">
                     <div id="arm-rotator">
-                        <img src="ARPS/SVG/ArmRetracted_open.svg" id="arm-retracted-open-0" class="arm-part rot-0"
-                            alt="retracted open 0">
-                        <img src="ARPS/SVG/ArmRetracted_open.svg" id="arm-retracted-open-180" class="arm-part rot-180"
-                            alt="retracted open 180">
-
-                        <img src="ARPS/SVG/ArmExtended_open.svg" id="arm-extended-open-0" class="arm-part rot-0 hidden"
-                            alt="extended open 0">
-                        <img src="ARPS/SVG/ArmExtended_closed.svg" id="arm-extended-closed-0"
-                            class="arm-part rot-0 hidden" alt="extended closed 0">
-
-                        <img src="ARPS/SVG/ArmExtended_open.svg" id="arm-extended-open-180"
-                            class="arm-part rot-180 hidden" alt="extended open 180">
-                        <img src="ARPS/SVG/ArmExtended_closed.svg" id="arm-extended-closed-180"
-                            class="arm-part rot-180 hidden" alt="extended closed 180">
-
-                        <img src="ARPS/SVG/TapeCassette_pick.svg" id="tape-cassette-pick-0"
-                            class="arm-part rot-0 hidden" alt="tape pick 0">
-                        <img src="ARPS/SVG/TapeCassette_pick.svg" id="tape-cassette-pick-180"
-                            class="arm-part rot-180 hidden" alt="tape pick 180">
+                        <div id="arm-0" class="arm-side rot-0">
+                            <img src="ARPS/SVG/ArmRetracted_open.svg" id="arm-retracted-open-0" class="arm-part" alt="retracted open 0">
+                            <img src="ARPS/SVG/ArmExtended_open.svg" id="arm-extended-open-0" class="arm-part hidden" alt="extended open 0">
+                            <img src="ARPS/SVG/ArmExtended_closed.svg" id="arm-extended-closed-0" class="arm-part hidden" alt="extended closed 0">
+                            <img src="ARPS/SVG/TapeCassette_pick.svg" id="tape-cassette-pick-0" class="arm-part hidden" alt="tape pick 0">
+                        </div>
+                        <div id="arm-180" class="arm-side rot-180">
+                            <img src="ARPS/SVG/ArmRetracted_open.svg" id="arm-retracted-open-180" class="arm-part" alt="retracted open 180">
+                            <img src="ARPS/SVG/ArmExtended_open.svg" id="arm-extended-open-180" class="arm-part hidden" alt="extended open 180">
+                            <img src="ARPS/SVG/ArmExtended_closed.svg" id="arm-extended-closed-180" class="arm-part hidden" alt="extended closed 180">
+                            <img src="ARPS/SVG/TapeCassette_pick.svg" id="tape-cassette-pick-180" class="arm-part hidden" alt="tape pick 180">
+                        </div>
                     </div>
                 </div>
 

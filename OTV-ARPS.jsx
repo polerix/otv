@@ -43,7 +43,7 @@ function useInterval(fn, ms) {
   }, [ms]);
 }
 
-function OTVArps() {
+function otvArps() {
   const [tapes, setTapes] = useState(INIT_TAPES);
   const [busy, setBusy] = useState(false);
   const [robotPhase, setRobotPhase] = useState("idle");
@@ -53,7 +53,7 @@ function OTVArps() {
   const [ejecting, setEjecting] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [termLog, setTermLog] = useState([
-    "OTV-ARPS LIBRARY SYSTEM v2.1",
+    "otv-ARPS LIBRARY SYSTEM v2.1",
     "────────────────────────────",
     "> Type HELP for commands.",
   ]);
@@ -122,8 +122,8 @@ function OTVArps() {
 
         {/* LEFT SIDEBAR */}
         <div style={S.sidebar}>
-          <OTVLogo />
-          <div style={S.brand}>OTV</div>
+          <otvLogo />
+          <div style={S.brand}>otv</div>
           <div style={S.acro}>
             <AcroLine letter="A" word="utomated" />
             <AcroLine letter="R" word="ecord" />
@@ -365,7 +365,7 @@ function LibraryTerminal({ onClose, onAdd, library, log, setLog }) {
     <div style={S.overlay}>
       <div style={S.terminal}>
         <div style={S.termHead}>
-          <span style={S.termTitle}>◉ OTV-ARPS LIBRARY TERMINAL v2.1</span>
+          <span style={S.termTitle}>◉ otv-ARPS LIBRARY TERMINAL v2.1</span>
           <button onClick={onClose} style={S.exitBtn}>[EXIT]</button>
         </div>
         <div ref={logRef} style={S.termLog}>
@@ -398,9 +398,9 @@ function LibraryTerminal({ onClose, onAdd, library, log, setLog }) {
 }
 
 // ── Small components ───────────────────────────────────────────────────────
-function OTVLogo() {
+function otvLogo() {
   return (
-    <img src={`${IMG_BASE}/OTV logo.png`} alt="OTV" style={{ marginBottom: 6, width: 88, height: 72, objectFit: 'contain' }} />
+    <img src={`${IMG_BASE}/otv logo.png`} alt="otv" style={{ marginBottom: 6, width: 88, height: 72, objectFit: 'contain' }} />
   );
 }
 
@@ -471,4 +471,4 @@ const CSS = `
 // Render the application to the root DOM node
 const rootElement = document.getElementById("root");
 const root = ReactDOM.createRoot(rootElement);
-root.render(<OTVArps />);
+root.render(<otvArps />);
