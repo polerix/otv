@@ -231,12 +231,16 @@ function setupKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
         if (!document.getElementById('app-screen').classList.contains('active')) return;
 
-        if (e.key === 'ArrowRight') {
-            selectedIndex = (selectedIndex + 1) % CASSETTES_COUNT;
-            renderCassettes();
-        } else if (e.key === 'ArrowLeft') {
+        if (e.key === 'ArrowLeft') {
             selectedIndex = (selectedIndex - 1 + CASSETTES_COUNT) % CASSETTES_COUNT;
             renderCassettes();
+        } else if (e.key === 'ArrowRight') {
+            selectedIndex = (selectedIndex + 1) % CASSETTES_COUNT;
+            renderCassettes();
+        } else if (e.key === 'Enter') {
+            // Open info modal for currently selected cassette
+            const cassette = cassettes[selectedIndex];
+            if (cassette) showModal(cassette);
         }
     });
 }
