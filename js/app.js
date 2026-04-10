@@ -20,6 +20,7 @@ const cassettes = [
 ];
 
 let selectedIndex = 0;
+let inFlightCassetteId = null; // Tracks which cassette is currently on the arm
 
 const CASSETTE_SVG = `<svg class="cassette-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 109.93 56.13">
   <defs>
@@ -122,7 +123,9 @@ function renderCassettes() {
     displayIndices.forEach((index, positionInQueue) => {
         const cassette = cassettes[index];
         const slot = document.createElement('div');
-        slot.className = `cassette-slot ${index === selectedIndex ? 'selected' : ''}`;
+        const isSelected = index === selectedIndex;
+        const isLifted = index === inFlightCassetteId;
+        slot.className = `cassette-slot ${isSelected ? 'selected' : ''} ${isLifted ? 'lifted' : ''}`;
         slot.dataset.index = index;
 
         const tooltip = document.createElement('div');
@@ -134,7 +137,7 @@ function renderCassettes() {
         overlayText.innerText = index + 1;
 
         const wrapper = document.createElement('div');
-        wrapper.className = `svg-wrapper ${index === selectedIndex ? 'selected-wrapper' : ''}`;
+        wrapper.className = `svg-wrapper ${isSelected ? 'selected-wrapper' : ''}`;
         wrapper.innerHTML = CASSETTE_SVG;
 
         const baseFill = wrapper.querySelector('.cls-1');
@@ -166,7 +169,7 @@ function renderCassettes() {
         queue.appendChild(slot);
     });
 
-    const clawX = 674; // 324px (left panel width) + 350px (half of right panel width)
+    const clawX = 699; // 324px (left panel width) + 375px (shifted center)
     
     // The "selected" cassette is exactly at position centerOffset.
     const selectedPosition = centerOffset;
@@ -287,12 +290,14 @@ async function runSwapSequence() {
     const els = {
         0: {
             retractedOpen: document.getElementById('arm-retracted-open-0'),
+            retractedClosed: document.getElementById('arm-retracted-closed-0'),
             extendedOpen: document.getElementById('arm-extended-open-0'),
             extendedClosed: document.getElementById('arm-extended-closed-0'),
             pick: document.getElementById('tape-cassette-pick-0')
         },
         180: {
             retractedOpen: document.getElementById('arm-retracted-open-180'),
+            retractedClosed: document.getElementById('arm-retracted-closed-180'),
             extendedOpen: document.getElementById('arm-extended-open-180'),
             extendedClosed: document.getElementById('arm-extended-closed-180'),
             pick: document.getElementById('tape-cassette-pick-180')
@@ -311,47 +316,81 @@ async function runSwapSequence() {
 
     // Helper to asynchronously animate a single arm grabbing a tape
     async function pickTape(arm) {
+        // Step 1: Start Extension
+        arm.pick.style.setProperty('--pick-y', '40px'); // Ensure it starts from retracted position
+        
+        // Step 2: Extend Arm and Slide Tape simultaneously
         arm.retractedOpen.classList.add('hidden');
         arm.extendedOpen.classList.remove('hidden');
         
-        await delay(1000); // Time to extend
+        // Hand-off from Queue (if it's the bottom arm)
+        if (arm.pick.id.includes('180')) {
+            inFlightCassetteId = selectedIndex;
+            const selectedSlot = document.querySelector('.cassette-slot.selected');
+            if (selectedSlot) selectedSlot.classList.add('lifted');
+        }
+
+        arm.pick.classList.add('arm-extended-pick-state');
+        arm.pick.style.setProperty('--pick-y', '0px');
+        await delay(500); // Match CSS transition
         
+        // Step 3: Grab
         arm.pick.classList.remove('hidden');
-        
-        await delay(250); // Pause briefly before closing
-        
+        await delay(250); 
         arm.extendedOpen.classList.add('hidden');
         arm.extendedClosed.classList.remove('hidden');
-        
-        // Retract while holding the tape
-        arm.pick.style.transform = 'translate(0, -100px)'; // 100px relative translation upwards to hub center
-        arm.pick.style.transition = 'transform 0.5s ease-in-out';
-        
-        await delay(500); // Time to retract
+        await delay(250);
+
+        // Step 4: Retract
+        arm.extendedClosed.classList.add('hidden');
+        arm.retractedClosed.classList.remove('hidden');
+        arm.pick.classList.remove('arm-extended-pick-state');
+        arm.pick.classList.add('arm-retracted-closed-state');
+        arm.pick.style.setProperty('--pick-y', '40px');
+        await delay(500); 
     }
 
     // Helper to asynchronously animate a single arm placing a tape
     async function placeTape(arm) {
-        // Start from retracted closed position (which is conceptually ExtendedClosed hidden state reversed)
-        // Wait, physically placing involves pushing it OUT to the 100px extreme
-        
-        // Push tape out
-        arm.pick.style.transform = 'translate(0, 0px)'; // reset to original SVG bounds (extended)
-        arm.pick.style.transition = 'transform 0.25s ease-in-out';
-        await delay(250);
-        
-        // Open the claw
+        // Step 6: Deploy members
+        // Swap to extended asset and start slide in one motion
+        arm.retractedClosed.classList.add('hidden');
+        arm.extendedClosed.classList.remove('hidden');
+        arm.pick.classList.remove('arm-retracted-pick-state');
+        arm.pick.classList.add('arm-extended-pick-state');
+        arm.pick.style.setProperty('--pick-y', '0px');
+        await delay(500); // Motion duration
+
+        // Step 7: Release
+        await delay(200); 
         arm.extendedClosed.classList.add('hidden');
         arm.extendedOpen.classList.remove('hidden');
+        await delay(400); 
         
-        await delay(250); // Short pause to let tape go
+        // Hand-off to Queue (if it's the bottom arm)
+        if (arm.pick.id.includes('180')) {
+            // Render the queue with the slot already in the 'lifted' (up) state
+            renderCassettes(); 
+            
+            // Allow a tiny frame for the element to exist in the DOM
+            await delay(50);
+            
+            // Clear the logical state
+            inFlightCassetteId = null;
+            
+            // Find the physical element and remove '.lifted' to trigger the slide down
+            const targetSlot = document.querySelector('.cassette-slot.selected');
+            if (targetSlot) targetSlot.classList.remove('lifted');
+        }
         
-        arm.pick.classList.add('hidden'); // Tape is dropped in player/library
-        
-        await delay(1000); // Time to retract empty arm
-        
+        arm.pick.classList.add('hidden'); 
+        arm.pick.classList.remove('arm-extended-pick-state');
+        await delay(200); 
+
+        // Step 8: Return
         arm.extendedOpen.classList.add('hidden');
         arm.retractedOpen.classList.remove('hidden');
+        await delay(500);
     }
 
     // --- 1. BOTH ARMS EXTEND AND PICK SIMULTANEOUSLY ---
@@ -375,9 +414,8 @@ async function runSwapSequence() {
     
     // Swap the class visibilities instantly because the hub flipped back to 0 mathematically
     // but the tapes and arms need to physically trade places in the DOM
-    [els[0].extendedClosed.className, els[180].extendedClosed.className] = [els[180].extendedClosed.className, els[0].extendedClosed.className];
+    [els[0].retractedClosed.className, els[180].retractedClosed.className] = [els[180].retractedClosed.className, els[0].retractedClosed.className];
     [els[0].pick.className, els[180].pick.className] = [els[180].pick.className, els[0].pick.className];
-    // Also reset any lingering internal translation states so the swap is clean
     [els[0].pick.style.transform, els[180].pick.style.transform] = [els[180].pick.style.transform, els[0].pick.style.transform];
     
 

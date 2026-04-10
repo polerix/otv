@@ -141,15 +141,16 @@ body {
 
 /* Device Panel (Right) */
 #device-panel {
-  flex: 1;
-  position: relative; /* Keep relative for child absolute positioning */
-  height: 100%;
+  position: absolute;
+  left: 324px;
+  top: 0;
+  width: 700px;
+  height: 768px;
+  background: #231f20;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  /* Shift entire grid + arm system mathematically down to meet cassette tape */
-  transform: translateY(122px); /* 500 center - 378 target = 122px offset */
 }
 
 /* Device Panel Statics */
@@ -175,11 +176,14 @@ body {
 }
 
 #tape-deck {
+  position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(-50% - 530px));
   width: 600px;
   height: 600px;
+  z-index: 100;
+  filter: drop-shadow(10px 10px 20px rgba(0, 0, 0, 0.7));
 }
 
 /* Arm Container */
@@ -191,6 +195,8 @@ body {
   height: 600px;
   transform: translate(-50%, -50%);
   z-index: 10;
+  /* Shadow applied here so it doesn't rotate with the arms */
+  filter: drop-shadow(12px 12px 25px rgba(0, 0, 0, 0.7));
 }
 
 .arm-part {
@@ -239,6 +245,7 @@ body {
   padding: 0 0 40px 0; /* padding bottom instead of center */
   box-sizing: border-box;
   transition: transform 0.5s ease-in-out;
+  filter: drop-shadow(8px 8px 15px rgba(0, 0, 0, 0.7));
 }
 
 .cassette-slot {
@@ -248,6 +255,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  /* Smooth mechanical transition for lift and pop-up */
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease-out;
 }
 
 .cassette-img {
@@ -269,6 +278,12 @@ body {
 
 .cassette-slot.selected {
   transform: translateY(-50px);
+}
+
+.cassette-slot.lifted {
+  transform: translateY(-150px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .progress-container {
@@ -419,11 +434,11 @@ body {
 }
 
 .rot-0 {
-  transform: translate(-50%, -50%) rotate(0deg);
+  transform: rotate(0deg);
 }
 
 .rot-180 {
-  transform: translate(-50%, -50%) rotate(180deg);
+  transform: rotate(180deg);
 }
 
 /* Ensure absolute centering for all arm parts */
@@ -431,27 +446,45 @@ body {
   position: absolute;
   width: 600px;
   height: 600px;
-  top: 0;
-  left: 0;
+  top: -300px;
+  left: -300px;
 }
 
 .arm-part {
   position: absolute;
-  top: 0;
+  top: 12px;
   left: 0;
   width: 600px;
   height: 600px;
 }
 
-/* Base button states */
-
-
-#arm-rotator img {
-  left: 50%;
-  top: 50%;
+/* Staggered offsets for parallel tracks (+30px / -30px) 
+   Includes +5px additional shift for cassette alignment: 
+   Retracted: 11.7 (Base) + 5.0 (Claw Adjust) = 16.7
+   Extended: 7.4 (Base) + 5.0 (Claw Adjust) = 12.4
+*/
+/* Refined state-based offsets to compensate for SVG internal center differences 
+   Retracted Open is offset by 4.4px internally vs the other 3 states.
+*/
+[id*="retracted-open"], .arm-retracted-open-state {
+  --arm-x: 16.7px;
+  transform: translateX(var(--arm-x));
 }
 
-/* App is fixed scale */
+[id*="retracted-closed"], [id*="extended-open"], [id*="extended-closed"], 
+.arm-extended-pick-state, .arm-retracted-closed-state {
+  --arm-x: 12.4px;
+  transform: translateX(var(--arm-x));
+}
+
+[id^="tape-cassette-pick"] {
+  /* Cassette uses a combined transform to allow JS to control Y independently */
+  transform: translateX(var(--arm-x, 12.4px)) translateY(var(--pick-y, 0px));
+  /* Faster transition for a snappy mechanical feel */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base button states */
 body {
   background-color: #000;
 }
@@ -469,14 +502,7 @@ body {
 
 /* Removed absolute #control-panel position since we combined it earlier */
 
-#device-panel {
-  position: absolute;
-  left: 324px;
-  top: 0;
-  width: 700px;
-  height: 768px;
-  background: #231f20;
-}
+/* Device panel consolidated above */
 
 
 
@@ -499,12 +525,12 @@ body[data-role="operator"] #btn-stop {
   object-fit: contain;
 }
 
-#control-panel > img[src*="otv logo.svg"] {
+#control-panel > img[src*="OTV-Logo.svg"] {
   width: 124.15px;
   height: 133.58px;
 }
 
-#control-panel > img[src*="APRS.svg"] {
+#control-panel > img[src*="ARPS.svg"] {
   width: 182.5px;
   height: 131.52px;
 }

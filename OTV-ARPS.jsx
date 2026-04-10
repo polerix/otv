@@ -1,6 +1,6 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
-const IMG_BASE = "./ARPS";// ── Constants ──────────────────────────────────────────────────────────────
+const IMG_BASE = "./ARPS/1x"; // Points to the PNG folder──────────────────────────────────────────────────────────────
 const STATUS = { PLAYING: "playing", NEXT: "next", QUEUED: "queued", DONE: "done" };
 const STATUS_COLOR = { playing: "#ff2222", next: "#ffcc00", queued: "#666", done: "#22cc55" };
 const STATUS_GLOW = { playing: "#ff000066", next: "#ffcc0044", queued: "transparent", done: "#22cc5533" };
@@ -214,9 +214,8 @@ function RobotSVG({ armDeg, fingersOpen, hasTape, ejecting, robotPhase, tick, on
   return (
     <svg viewBox="0 0 600 560" width="100%" height="100%" style={{ display: "block" }}>
 
-      {/* ── LIBRARY DEVICE ── */}
       <g onClick={onLibraryClick} style={{ cursor: "pointer" }}>
-        <image href={`${IMG_BASE}/tapeDeck.png`} x={185} y={16} width={230} height={106} preserveAspectRatio="none" />
+        <image href={`${IMG_BASE}/TapeDeck.png`} x={185} y={16} width={230} height={106} preserveAspectRatio="none" />
         {/* Hover ring */}
         <rect x={185} y={16} width={230} height={106} rx={8} fill="transparent"
           stroke="#4488ff" strokeWidth={1} opacity={0.4} />
@@ -236,7 +235,7 @@ function RobotSVG({ armDeg, fingersOpen, hasTape, ejecting, robotPhase, tick, on
       {/* ── EJECTED TAPE ── */}
       {ejecting && (
         <g className="tape-eject">
-          <image href={`${IMG_BASE}/tapeCassette.png`} x={272} y={90} width={56} height={34} preserveAspectRatio="none" />
+          <image href={`${IMG_BASE}/TapeCassette.png`} x={272} y={90} width={56} height={34} preserveAspectRatio="none" />
         </g>
       )}
 
@@ -244,7 +243,7 @@ function RobotSVG({ armDeg, fingersOpen, hasTape, ejecting, robotPhase, tick, on
       <rect x={296} y={134} width={8} height={HY - 134 - 20} fill="#223355" rx={3} />
 
       {/* ── UPPER CASSETTE CLAMP ── */}
-      <image href={`${IMG_BASE}/${robotPhase !== "idle" ? 'CLampOpen.png' : 'CLampClosed.png'}`} x={244} y={153} width={112} height={36} preserveAspectRatio="none" />
+      <image href={`${IMG_BASE}/${robotPhase !== "idle" ? 'GripOpen.png' : 'GripClosed.png'}`} x={244} y={153} width={112} height={36} preserveAspectRatio="none" />
 
       {/* ── ARM GROUP (rotates around hub) ── */}
       <g style={{ transform: `rotate(${armDeg}deg)`, transformOrigin: `${HX}px ${HY}px`, transition: `transform ${T_ROTATE / 1000}s ease-in-out` }}>
@@ -254,7 +253,7 @@ function RobotSVG({ armDeg, fingersOpen, hasTape, ejecting, robotPhase, tick, on
 
         {/* Upper tape (in-transit) */}
         {hasTape && (
-          <image href={`${IMG_BASE}/tapeCassette.png`} x={HX - 28} y={HY - ARM - 18} width={56} height={34} preserveAspectRatio="none" />
+          <image href={`${IMG_BASE}/TapeCassette.png`} x={HX - 28} y={HY - ARM - 18} width={56} height={34} preserveAspectRatio="none" />
         )}
 
         {/* Lower arm shaft & Grip (rotated 180 to point down) */}
@@ -267,7 +266,7 @@ function RobotSVG({ armDeg, fingersOpen, hasTape, ejecting, robotPhase, tick, on
       <circle cx={HX - 8} cy={HY - 8} r={6} fill="rgba(255,255,255,0.15)" />
 
       {/* ── LOWER CASSETTE CLAMP ── */}
-      <image href={`${IMG_BASE}/${robotPhase !== "idle" ? 'CLampOpen.png' : 'CLampClosed.png'}`} x={244} y={HY + 73} width={112} height={36} preserveAspectRatio="none" />
+      <image href={`${IMG_BASE}/${robotPhase !== "idle" ? 'GripOpen.png' : 'GripClosed.png'}`} x={244} y={HY + 73} width={112} height={36} preserveAspectRatio="none" />
 
       {/* Phase label on hub */}
       {robotPhase !== "idle" && (
@@ -400,7 +399,7 @@ function LibraryTerminal({ onClose, onAdd, library, log, setLog }) {
 // ── Small components ───────────────────────────────────────────────────────
 function otvLogo() {
   return (
-    <img src={`${IMG_BASE}/otv logo.png`} alt="otv" style={{ marginBottom: 6, width: 88, height: 72, objectFit: 'contain' }} />
+    <img src={`${IMG_BASE}/OTV-Logo.png`} alt="otv" style={{ marginBottom: 6, width: 88, height: 72, objectFit: 'contain' }} />
   );
 }
 
@@ -446,7 +445,7 @@ const S = {
   slot: { flex: 1, height: 62, background: "#161616", borderRadius: 3, padding: "5px 7px", position: "relative", display: "flex", flexDirection: "column", alignItems: "flex-start", overflow: "hidden", transition: "box-shadow 0.3s" },
 
   overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center" },
-  terminal: { width: 620, height: 420, display: "flex", flexDirection: "column", background: `url("${IMG_BASE}/activeScreenMonitor.png") center/100% 100% no-repeat`, border: "none", borderRadius: 8, overflow: "hidden", boxShadow: "0 0 50px #0033aa55", padding: "10px" },
+  terminal: { width: 620, height: 420, display: "flex", flexDirection: "column", background: `url("${IMG_BASE}/ApplicationCRT.png") center/100% 100% no-repeat`, border: "none", borderRadius: 8, overflow: "hidden", boxShadow: "0 0 50px #0033aa55", padding: "10px" },
   termHead: { padding: "10px 14px", borderBottom: "1px solid #102040", display: "flex", justifyContent: "space-between", alignItems: "center" },
   termTitle: { color: "#3388ff", fontSize: 11, letterSpacing: 2 },
   exitBtn: { background: "none", border: "1px solid #224", color: "#446", cursor: "pointer", padding: "3px 10px", fontSize: 11, fontFamily: "Courier New", letterSpacing: 1 },
