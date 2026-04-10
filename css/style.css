@@ -379,6 +379,27 @@ body {
 .complex-btn .btn-frame {
   width: 100%;
   height: 100%;
+}
+
+/* Admin specific button size (30% smaller than complex-btn) */
+.btn-admin {
+  width: 145.81px;
+  height: 127.55px;
+}
+
+/* Pulsing Task Animation */
+@keyframes pulseFade {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.task-active {
+  animation: pulseFade 1s infinite ease-in-out;
+}
+
+.complex-btn .btn-bg,
+.complex-btn .btn-frame {
   object-fit: contain;
   z-index: 10;
   pointer-events: none;
@@ -537,4 +558,59 @@ body[data-role="operator"] #btn-stop {
 
 body[data-role="operator"] .user-mode-logo {
   display: block;
+}
+
+/* Info Modal Styles */
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.3s ease;
+}
+
+.info-modal {
+  background: #ffdb00; /* Industrial Yellow */
+  border: 4px solid #000;
+  border-radius: 4px;
+  width: 400px;
+  padding: 20px;
+  position: relative;
+  box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.4);
+  color: #000;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.info-modal h2 {
+  margin-top: 0;
+  border-bottom: 2px solid #000;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.info-modal .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.info-modal .modal-content p {
+  margin: 10px 0;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.info-modal .label-tag {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-right: 5px;
 }

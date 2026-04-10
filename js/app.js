@@ -9,14 +9,14 @@ const COLOR_MAPPING = {
 };
 
 const cassettes = [
-    { id: 0, label: 'Die Hard', status: 'idle' },
-    { id: 1, label: 'otv Station ID', status: 'active' }, // One must be active
-    { id: 2, label: 'Robocop', status: 'cued' },
-    { id: 3, label: 'Lethal Weapon 2', status: 'idle' },
-    { id: 4, label: 'Toy R Us Commercial', status: 'ad' },
-    { id: 5, label: 'Predator', status: 'idle' },
-    { id: 6, label: 'Terminator 2', status: 'idle' },
-    { id: 7, label: 'Aliens', status: 'idle' },
+    { id: 0, label: 'Die Hard', subLabel: '1988 Action Classic', status: 'idle', duration: '02:12:00', scheduledTime: '21:00' },
+    { id: 1, label: 'otv Station ID', subLabel: 'Channel bumper', status: 'active', duration: '00:00:15', scheduledTime: 'Live' },
+    { id: 2, label: 'Robocop', subLabel: 'Verhoeven Masterpiece', status: 'cued', duration: '01:42:00', scheduledTime: '23:30' },
+    { id: 3, label: 'Lethal Weapon 2', subLabel: 'Riggs and Murtaugh', status: 'idle', duration: '01:54:00', scheduledTime: '01:15' },
+    { id: 4, label: 'Toy R Us Commercial', subLabel: 'Nostalgia block', status: 'ad', duration: '00:01:00', scheduledTime: '15:45' },
+    { id: 5, label: 'Predator', subLabel: 'Jungle Survival', status: 'idle', duration: '01:47:00', scheduledTime: '17:30' },
+    { id: 6, label: 'Terminator 2', subLabel: 'Judgment Day', status: 'idle', duration: '02:17:00', scheduledTime: '19:00' },
+    { id: 7, label: 'Aliens', subLabel: 'Special Edition', status: 'idle', duration: '02:34:00', scheduledTime: '03:45' },
 ];
 
 let selectedIndex = 0;
@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupKeyboardNavigation();
     setupControls();
     setupResize();
+    initModal();
 });
 
 function setupResize() {
@@ -169,6 +170,8 @@ function renderCassettes() {
         queue.appendChild(slot);
     });
 
+    syncButtonStates();
+
     const clawX = 699; // 324px (left panel width) + 375px (shifted center)
     
     // The "selected" cassette is exactly at position centerOffset.
@@ -192,6 +195,36 @@ function renderCassettes() {
     
     queue.style.transform = `translateX(${translateX}px) scale(${queueScale})`;
     queue.style.transformOrigin = 'left bottom';
+}
+
+function syncButtonStates() {
+    const selectedCassette = cassettes[selectedIndex];
+    const btnPlay = document.getElementById('btn-play');
+    const btnPause = document.getElementById('btn-pause');
+    const btnSwap = document.getElementById('btn-swap');
+
+    if (!btnPlay || !btnPause || !btnSwap) return;
+
+    // Play pulsing while playing
+    if (selectedCassette.status === 'playing') {
+        btnPlay.classList.add('task-active');
+    } else {
+        btnPlay.classList.remove('task-active');
+    }
+
+    // Pause pulsing while paused
+    if (selectedCassette.status === 'paused') {
+        btnPause.classList.add('task-active');
+    } else {
+        btnPause.classList.remove('task-active');
+    }
+
+    // Swap pulsing while arm is moving
+    if (isAnimating) {
+        btnSwap.classList.add('task-active');
+    } else {
+        btnSwap.classList.remove('task-active');
+    }
 }
 
 function setupKeyboardNavigation() {
@@ -233,25 +266,21 @@ function setupControls() {
     setupButton('btn-pause', () => { });
 
     setupButton('btn-stop', () => {
+        const btnStop = document.getElementById('btn-stop');
+        btnStop.classList.add('task-active');
+        setTimeout(() => btnStop.classList.remove('task-active'), 2000);
+
         const cassette = cassettes[selectedIndex];
         if (cassette.status === 'active') {
             triggerFault();
         } else if (cassette.status === 'playing') {
             cassette.status = 'idle';
+            syncButtonStates();
             renderCassettes();
         }
     });
 
     setupButton('btn-swap', () => {
-        if (isAnimating) return;
-        
-        const cassette = cassettes[selectedIndex];
-        if (document.body.dataset.role === 'operator' && cassette.status === 'playing') {
-            // Show error indicator (e.g. flashing fault) and block swap
-            triggerFault();
-            return;
-        }
-        
         runSwapSequence();
     });
 }
@@ -284,7 +313,17 @@ const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 let isAnimating = false;
 
 async function runSwapSequence() {
+    if (isAnimating) return;
+    
+    const cassette = cassettes[selectedIndex];
+    if (document.body.dataset.role === 'operator' && cassette.status === 'playing') {
+        // Show error indicator (e.g. flashing fault) and block swap
+        triggerFault();
+        return;
+    }
+
     isAnimating = true;
+    syncButtonStates();
 
     // Elements mapped by arm rotation angle group
     const els = {
@@ -304,9 +343,6 @@ async function runSwapSequence() {
         },
         rotator: document.getElementById('arm-rotator')
     };
-
-    const btnSwap = document.getElementById('btn-swap');
-    btnSwap.classList.add('anim-active');
 
     // Make sure we are at baseline before start
     els.rotator.style.transition = 'none';
@@ -425,6 +461,87 @@ async function runSwapSequence() {
         placeTape(els[180])
     ]);
 
-    btnSwap.classList.remove('anim-active');
     isAnimating = false;
+    syncButtonStates();
+}
+
+/**
+ * Initializes the Administrative Info Modal
+ */
+function initModal() {
+    const overlay = document.getElementById('modal-overlay');
+    const closeBtn = document.getElementById('modal-close-x');
+    const queue = document.getElementById('cassette-queue');
+
+    // Click delegation for cassette slots
+    queue.addEventListener('click', (e) => {
+        const slot = e.target.closest('.cassette-slot');
+        if (!slot) return;
+
+        const index = parseInt(slot.dataset.index);
+        const cassette = cassettes[index];
+        if (!cassette) return;
+
+        showModal(cassette);
+    });
+
+    // Close on X
+    closeBtn.addEventListener('click', hideModal);
+
+    // Close on Backdrop click
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) hideModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
+            hideModal();
+        }
+    });
+}
+
+function showModal(cassette) {
+    const overlay = document.getElementById('modal-overlay');
+    document.getElementById('modal-title').innerText = cassette.label;
+    document.getElementById('modal-sublabel').innerText = cassette.subLabel || '-';
+    document.getElementById('modal-duration').innerText = cassette.duration || '-';
+    document.getElementById('modal-scheduled').innerText = cassette.scheduledTime || '-';
+    
+    const timeUntilElem = document.getElementById('modal-timeleft');
+    if (cassette.scheduledTime === 'Live') {
+        timeUntilElem.innerText = 'Now Playing';
+    } else {
+        timeUntilElem.innerText = getTimeUntil(cassette.scheduledTime);
+    }
+
+    overlay.classList.remove('hidden');
+}
+
+function hideModal() {
+    document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+/**
+ * Calculates time remaining until a scheduled HH:MM event
+ */
+function getTimeUntil(scheduledTime) {
+    if (!scheduledTime || scheduledTime === '-') return 'TBD';
+    
+    const now = new Date();
+    const [hrs, mins] = scheduledTime.split(':').map(Number);
+    
+    let target = new Date();
+    target.setHours(hrs, mins, 0, 0);
+    
+    // If target is earlier than now, it's for tomorrow
+    if (target < now) {
+        target.setDate(target.getDate() + 1);
+    }
+    
+    const diffMs = target - now;
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${diffHrs}h ${diffMins}m remaining`;
 }
