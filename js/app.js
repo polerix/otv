@@ -19,6 +19,21 @@ const cassettes = [
     { id: 7, label: 'Aliens', subLabel: 'Special Edition', status: 'idle', duration: '02:34:00', scheduledTime: '03:45' },
 ];
 
+const LIBRARY_DATABASE = [
+    { label: 'Alien', subLabel: '1979 Sci-Fi Horror', duration: '01:57:00' },
+    { label: 'Blade Runner', subLabel: 'Director\'s Cut', duration: '01:57:00' },
+    { label: 'Total Recall', subLabel: 'Get Your Ass to Mars', duration: '01:53:00' },
+    { label: 'The Thing', subLabel: 'John Carpenter Masterpiece', duration: '01:49:00' },
+    { label: 'Die Hard', subLabel: '1988 Action Classic', duration: '02:12:00' },
+    { label: 'Robocop', subLabel: 'Verhoeven Masterpiece', duration: '01:42:00' },
+    { label: 'Terminator 2', subLabel: 'Judgment Day', duration: '02:17:00' },
+    { label: 'Aliens', subLabel: 'Special Edition', duration: '02:34:00' },
+    { label: 'The Abyss', subLabel: 'Underwater Sci-Fi', duration: '02:51:00' },
+    { label: 'Star Wars', subLabel: 'A New Hope', duration: '02:01:00' },
+    { label: 'The Empire Strikes Back', subLabel: 'Hoth Battle', duration: '02:04:00' },
+    { label: 'Back to the Future', subLabel: 'Delorean Time Trip', duration: '01:56:00' }
+];
+
 let selectedIndex = 0;
 let inFlightCassetteId = null; // Tracks which cassette is currently on the arm
 
@@ -46,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupControls();
     setupResize();
     initModal();
+    initLibraryModal();
 });
 
 function setupResize() {
@@ -467,6 +483,93 @@ async function runSwapSequence() {
 
     isAnimating = false;
     syncButtonStates();
+}
+
+/**
+ * Initializes the Media Library Search Interface
+ */
+function initLibraryModal() {
+    const modal = document.getElementById('library-modal');
+    const closeX = document.getElementById('library-close-x');
+    const searchInput = document.getElementById('search-input');
+    const resultsContainer = document.getElementById('search-results');
+    const selectBtn = document.getElementById('btn-select-media');
+
+    let selectedLibraryIndex = -1;
+
+    // Button Triggers
+    setupButton('btn-edit', () => {
+        // Placeholder for spreadsheet
+        window.open('https://docs.google.com/spreadsheets/d/placeholder', '_blank');
+    });
+
+    setupButton('btn-change', () => {
+        modal.classList.remove('hidden');
+        renderLibraryResults('');
+    });
+
+    // Close Logic
+    closeX.addEventListener('click', () => modal.classList.add('hidden'));
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.add('hidden');
+    });
+
+    // Search Logic
+    searchInput.addEventListener('input', (e) => {
+        renderLibraryResults(e.target.value);
+        selectedLibraryIndex = -1;
+        selectBtn.disabled = true;
+    });
+
+    function renderLibraryResults(query) {
+        resultsContainer.innerHTML = '';
+        const filtered = LIBRARY_DATABASE.filter(item => 
+            item.label.toLowerCase().includes(query.toLowerCase())
+        );
+
+        filtered.forEach((item, idx) => {
+            const div = document.createElement('div');
+            div.className = 'search-item';
+            div.innerHTML = `
+                <span class="item-title">${item.label}</span>
+                <span class="item-sub">${item.subLabel} | ${item.duration}</span>
+            `;
+            div.addEventListener('click', () => {
+                // Deselect others
+                document.querySelectorAll('.search-item').forEach(el => el.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedLibraryIndex = LIBRARY_DATABASE.indexOf(item);
+                selectBtn.disabled = false;
+            });
+            resultsContainer.appendChild(div);
+        });
+    }
+
+    // Selection Logic
+    selectBtn.addEventListener('click', () => {
+        if (selectedLibraryIndex === -1) return;
+        
+        const newMedia = LIBRARY_DATABASE[selectedLibraryIndex];
+        
+        // Update the current slot in the cassette array
+        // Preserve the ID but update the content and reset status
+        cassettes[selectedIndex] = {
+            ...cassettes[selectedIndex],
+            label: newMedia.label,
+            subLabel: newMedia.subLabel,
+            duration: newMedia.duration,
+            status: 'idle'
+        };
+
+        renderCassettes();
+        modal.classList.add('hidden');
+        
+        // Optional: Signal that it's ready for a Change Order
+        const btnSwap = document.getElementById('btn-swap');
+        btnSwap.classList.add('task-active');
+        setTimeout(() => btnSwap.classList.remove('task-active'), 5000);
+    });
 }
 
 /**

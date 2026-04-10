@@ -398,6 +398,20 @@ body {
   animation: pulseFade 1s infinite ease-in-out;
 }
 
+.btn-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 14px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+  pointer-events: none;
+  z-index: 20;
+}
+
 .complex-btn .btn-bg,
 .complex-btn .btn-frame {
   object-fit: contain;
@@ -535,10 +549,13 @@ body {
 }
 
 /* Role-based access control */
-body[data-role="operator"] #btn-play,
-body[data-role="operator"] #btn-pause,
-body[data-role="operator"] #btn-stop {
+.btn-admin {
   display: none;
+}
+
+body[data-role="operator"] .btn-admin,
+body[data-role="advanced"] .btn-admin {
+  display: flex;
 }
 
 .user-mode-logo {
@@ -556,7 +573,8 @@ body[data-role="operator"] #btn-stop {
   height: 131.52px;
 }
 
-body[data-role="operator"] .user-mode-logo {
+body[data-role="operator"] .user-mode-logo,
+body[data-role="advanced"] .user-mode-logo {
   display: block;
 }
 
@@ -613,4 +631,71 @@ body[data-role="operator"] .user-mode-logo {
   font-weight: bold;
   text-transform: uppercase;
   margin-right: 5px;
+}
+
+/* Search Modal Specifics */
+#search-input {
+  width: 100%;
+  padding: 10px;
+  background: #000;
+  color: #ffdb00;
+  border: 2px solid #000;
+  margin-bottom: 20px;
+  font-family: inherit;
+  font-size: 18px;
+  box-sizing: border-box;
+}
+
+#search-results {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 2px solid #000;
+  background: rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.search-item {
+  padding: 10px;
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-item:hover {
+  background: rgba(0,0,0,0.2);
+}
+
+.search-item.selected {
+  background: #000;
+  color: #ffdb00;
+}
+
+.search-item .item-title {
+  font-weight: bold;
+  display: block;
+}
+
+.search-item .item-sub {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.admin-action-btn {
+  background: #000;
+  color: #ffdb00;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.admin-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

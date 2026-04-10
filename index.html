@@ -68,6 +68,16 @@
                     <img src="ARPS/SVG/STOPDOWN.svg" class="btn-down hidden" alt="Stop Down">
                     <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
                 </div>
+                <div class="control-btn complex-btn btn-admin" id="btn-edit">
+                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
+                    <span class="btn-label">EDIT</span>
+                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                </div>
+                <div class="control-btn complex-btn btn-admin" id="btn-change">
+                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
+                    <span class="btn-label">CHANGE</span>
+                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                </div>
             </div>
 
             <!-- Device Panel (Right) -->
@@ -114,6 +124,21 @@
                         <p><span class="label-tag">Duration:</span> <span id="modal-duration">-</span></p>
                         <p><span class="label-tag">Scheduled:</span> <span id="modal-scheduled">-</span></p>
                         <p><span class="label-tag">Time Until:</span> <span id="modal-timeleft">-</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Library Search Modal -->
+            <div id="library-modal" class="modal-backdrop hidden">
+                <div class="info-modal">
+                    <span class="close-btn" id="library-close-x">&times;</span>
+                    <h2>Media Library</h2>
+                    <input type="text" id="search-input" placeholder="Search titles...">
+                    <div id="search-results">
+                        <!-- Results injected by JS -->
+                    </div>
+                    <div class="modal-footer">
+                        <button class="admin-action-btn" id="btn-select-media" disabled>Select</button>
                     </div>
                 </div>
             </div>
