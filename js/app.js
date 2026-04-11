@@ -243,24 +243,29 @@ function syncButtonStates() {
     const selectedCassette = cassettes[selectedIndex];
     const btnPlay = document.getElementById('btn-play');
     const btnPause = document.getElementById('btn-pause');
+    const btnStop = document.getElementById('btn-stop');
     const btnSwap = document.getElementById('btn-swap');
 
-    if (!btnPlay || !btnPause || !btnSwap) return;
+    if (!btnPlay || !btnPause || !btnSwap || !btnStop) return;
 
-    // Play button state (Pulsing / Disabled)
+    // Default UI lock for tactical panel (dark/OFF)
+    [btnPlay, btnPause, btnStop].forEach(btn => {
+        btn.classList.remove('task-active');
+        btn.classList.add('disabled-btn');
+    });
+
     if (selectedCassette.status === 'playing') {
-        btnPlay.classList.add('task-active');
-        btnPlay.classList.add('disabled-btn');
-    } else {
-        btnPlay.classList.remove('task-active');
-        btnPlay.classList.remove('disabled-btn');
-    }
-
-    // Pause pulsing while paused
-    if (selectedCassette.status === 'paused') {
+        // Program is actively broadcasting
+        btnPlay.classList.add('task-active'); 
+        // PLAY remains disabled, PAUSE and STOP go live
+        btnPause.classList.remove('disabled-btn');
+        btnStop.classList.remove('disabled-btn');
+    } else if (selectedCassette.status === 'paused') {
+        // Program is paused
         btnPause.classList.add('task-active');
-    } else {
-        btnPause.classList.remove('task-active');
+        // PAUSE remains disabled, PLAY and STOP go live to resume or abandon
+        btnPlay.classList.remove('disabled-btn');
+        btnStop.classList.remove('disabled-btn');
     }
 
     // Swap pulsing while arm is moving
