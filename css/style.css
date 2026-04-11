@@ -358,10 +358,10 @@ body {
   object-fit: contain;
 }
 
-/* Complex Layered Button */
+/* Complex Layered Button (Standardized to 70% of original industrial frame) */
 .complex-btn {
-  width: 208.3px;
-  height: 182.22px;
+  width: 145.81px;
+  height: 127.55px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -590,12 +590,12 @@ body[data-role="advanced"] .btn-admin {
 }
 
 #control-panel > img[src*="OTV-Logo.svg"] {
-  width: 208.3px;
+  width: 145.81px;
   height: auto;
 }
 
 #control-panel > img[src*="ARPS.svg"] {
-  width: 208.3px;
+  width: 145.81px;
   height: auto;
 }
 
