@@ -589,9 +589,9 @@ body[data-role="advanced"] .btn-admin {
   width: 100%;
 }
 
-#control-panel > img[src*="OTV-Logo.svg"] {
-  width: 124.15px;
-  height: 133.58px;
+#control-panel > img[src*="ARPS.svg"] {
+  width: 208.3px;
+  height: auto;
 }
 
 #control-panel:not(.admin-collapsed) > img[src*="ARPS.svg"] {
