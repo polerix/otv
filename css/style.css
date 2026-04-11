@@ -594,9 +594,8 @@ body[data-role="advanced"] .btn-admin {
   height: 133.58px;
 }
 
-#control-panel > img[src*="ARPS.svg"] {
-  width: 182.5px;
-  height: 131.52px;
+#control-panel:not(.admin-collapsed) > img[src*="ARPS.svg"] {
+  display: none;
 }
 
 .user-mode-logo {
