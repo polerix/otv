@@ -579,8 +579,15 @@ body[data-role="advanced"] .btn-admin {
   z-index: 1000;
 }
 
-#control-panel.admin-collapsed .control-row {
+#control-panel.admin-collapsed .admin-controls-wrapper {
   display: none;
+}
+
+.admin-controls-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
 }
 
 .control-row {
