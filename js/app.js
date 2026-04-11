@@ -246,11 +246,13 @@ function syncButtonStates() {
 
     if (!btnPlay || !btnPause || !btnSwap) return;
 
-    // Play pulsing while playing
+    // Play button state (Pulsing / Disabled)
     if (selectedCassette.status === 'playing') {
         btnPlay.classList.add('task-active');
+        btnPlay.classList.add('disabled-btn');
     } else {
         btnPlay.classList.remove('task-active');
+        btnPlay.classList.remove('disabled-btn');
     }
 
     // Pause pulsing while paused
