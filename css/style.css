@@ -387,6 +387,16 @@ body {
   height: 127.55px;
 }
 
+/* Mini button size (50% smaller than complex-btn) */
+.btn-mini {
+  width: 104.15px;
+  height: 91.11px;
+}
+
+.btn-mini .btn-label {
+  font-size: 10px;
+}
+
 /* Pulsing Task Animation */
 @keyframes pulseFade {
   0% { opacity: 0.6; }
@@ -558,9 +568,21 @@ body[data-role="advanced"] .btn-admin {
   display: flex;
 }
 
-.user-mode-logo {
-  display: none;
-  object-fit: contain;
+#control-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 40px 20px;
+  position: relative;
+  z-index: 1000;
+}
+
+.control-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
 }
 
 #control-panel > img[src*="OTV-Logo.svg"] {
@@ -571,6 +593,12 @@ body[data-role="advanced"] .btn-admin {
 #control-panel > img[src*="ARPS.svg"] {
   width: 182.5px;
   height: 131.52px;
+}
+
+.user-mode-logo {
+  display: none;
+  object-fit: contain;
+  margin-bottom: 20px;
 }
 
 body[data-role="operator"] .user-mode-logo,
@@ -640,17 +668,42 @@ body[data-role="advanced"] .user-mode-logo {
   background: #000;
   color: #ffdb00;
   border: 2px solid #000;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 16px;
   box-sizing: border-box;
 }
 
+.library-nav {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.category-tab {
+  background: #000;
+  color: #ffdb00;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+  text-transform: uppercase;
+  border: 1px solid #000;
+}
+
+.category-tab.active {
+  background: #ffdb00;
+  color: #000;
+  font-weight: bold;
+}
+
 #search-results {
-  max-height: 300px;
+  max-height: 250px;
+  min-height: 150px;
   overflow-y: auto;
   border: 2px solid #000;
-  background: rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.05);
   margin-bottom: 20px;
 }
 

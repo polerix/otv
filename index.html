@@ -49,34 +49,34 @@
                     <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
                 </div>
 
-                <!-- Admin Controls (Hidden in User Mode) -->
-                <div class="control-btn complex-btn btn-admin" id="btn-play">
-                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
-                    <img src="ARPS/SVG/PLAYUP.svg" class="btn-up" alt="Play">
-                    <img src="ARPS/SVG/PLAYDOWN.svg" class="btn-down hidden" alt="Play Down">
-                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                <!-- Admin Controls (3 Rows) -->
+                <div class="control-row">
+                    <div class="control-btn complex-btn btn-admin btn-mini" id="btn-play">
+                        <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
+                        <img src="ARPS/SVG/PLAYUP.svg" class="btn-up" alt="Play">
+                        <img src="ARPS/SVG/PLAYDOWN.svg" class="btn-down hidden" alt="Play Down">
+                        <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                    </div>
+                    <div class="control-btn complex-btn btn-admin btn-mini" id="btn-pause">
+                        <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
+                        <img src="ARPS/SVG/PAUSEUP.svg" class="btn-up" alt="Pause">
+                        <img src="ARPS/SVG/PAUSEDOWN.svg" class="btn-down hidden" alt="Pause Down">
+                        <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                    </div>
                 </div>
-                <div class="control-btn complex-btn btn-admin" id="btn-pause">
-                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
-                    <img src="ARPS/SVG/PAUSEUP.svg" class="btn-up" alt="Pause">
-                    <img src="ARPS/SVG/PAUSEDOWN.svg" class="btn-down hidden" alt="Pause Down">
-                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
-                </div>
-                <div class="control-btn complex-btn btn-admin" id="btn-stop">
-                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
-                    <img src="ARPS/SVG/STOPUP.svg" class="btn-up" alt="Stop">
-                    <img src="ARPS/SVG/STOPDOWN.svg" class="btn-down hidden" alt="Stop Down">
-                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
-                </div>
-                <div class="control-btn complex-btn btn-admin" id="btn-edit">
-                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
-                    <span class="btn-label">EDIT</span>
-                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
-                </div>
-                <div class="control-btn complex-btn btn-admin" id="btn-change">
-                    <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
-                    <span class="btn-label">CHANGE</span>
-                    <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+
+                <div class="control-row">
+                    <div class="control-btn complex-btn btn-admin btn-mini" id="btn-stop">
+                        <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
+                        <img src="ARPS/SVG/STOPUP.svg" class="btn-up" alt="Stop">
+                        <img src="ARPS/SVG/STOPDOWN.svg" class="btn-down hidden" alt="Stop Down">
+                        <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                    </div>
+                    <div class="control-btn complex-btn btn-admin btn-mini" id="btn-change">
+                        <img src="ARPS/SVG/buttonBKground.svg" class="btn-bg" alt="Background">
+                        <span class="btn-label">CHANGE</span>
+                        <img src="ARPS/SVG/ButtonFrame.svg" class="btn-frame" alt="Frame">
+                    </div>
                 </div>
             </div>
 
@@ -132,8 +132,20 @@
             <div id="library-modal" class="modal-backdrop hidden">
                 <div class="info-modal">
                     <span class="close-btn" id="library-close-x">&times;</span>
-                    <h2>Media Library</h2>
-                    <input type="text" id="search-input" placeholder="Search titles...">
+                    <h2>LIBRARY</h2>
+                    
+                    <div class="library-nav">
+                        <div class="category-tab" data-cat="Movies">Movies</div>
+                        <div class="category-tab" data-cat="Shows">Shows</div>
+                        <div class="category-tab" data-cat="Videos">Videos</div>
+                        <div class="category-tab" data-cat="Ads">Ads</div>
+                        <div class="category-tab" data-cat="Station ID">Station ID</div>
+                        <div class="category-tab" data-cat="Music Videos">Music Videos</div>
+                        <div class="category-tab" data-cat="News">News</div>
+                    </div>
+
+                    <input type="text" id="search-input" placeholder="Search Filter...">
+                    
                     <div id="search-results">
                         <!-- Results injected by JS -->
                     </div>
