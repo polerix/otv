@@ -290,26 +290,26 @@ body {
 
 .progress-container {
   position: absolute;
-  bottom: -4px; /* below the wrapper but relative to slot */
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: transparent;
+  left: 4px;
+  bottom: 0;
+  width: 4px;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   overflow: hidden;
   border-radius: 2px;
+  z-index: 20;
 }
 
-/* Because selected is rotated 180, bottom becomes top visually for the cassette,
-   but we attach progress bar to the slot so it stays at the bottom edge globally */
 .progress-bar {
+  width: 100%;
   height: 100%;
-  width: 0%;
   background: #fff;
+  /* Drains from top to bottom */
 }
 
 @keyframes playProgress {
-  0% { width: 0%; }
-  100% { width: 100%; }
+  0% { height: 100%; }
+  100% { height: 0%; }
 }
 
 .cassette-number {
