@@ -237,7 +237,7 @@ body {
   width: max-content;
   height: 200px;
   background: transparent;
-  z-index: 500;
+  z-index: 3000;
   display: flex;
   justify-content: flex-start;
   align-items: flex-end; /* Align to bottom so they can pop up */
@@ -587,6 +587,11 @@ body[data-role="advanced"] .btn-admin {
   justify-content: center;
   gap: 10px;
   width: 100%;
+}
+
+#control-panel > img[src*="OTV-Logo.svg"] {
+  width: 208.3px;
+  height: auto;
 }
 
 #control-panel > img[src*="ARPS.svg"] {
