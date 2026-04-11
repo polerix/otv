@@ -121,6 +121,25 @@ function initLogin() {
     });
 }
 
+function returnToLogin() {
+    isChangeOrderActive = false;
+    isSwapStaged = false;
+    document.getElementById('control-panel').classList.add('admin-collapsed');
+    
+    document.getElementById('app-screen').classList.add('hidden');
+    document.getElementById('app-screen').classList.remove('active');
+    
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.getElementById('login-screen').classList.add('active');
+    document.getElementById('entering-animation').classList.add('hidden');
+    document.getElementById('login-form').classList.remove('hidden');
+    document.getElementById('otv-logo').classList.remove('hidden');
+    
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    delete document.body.dataset.role;
+}
+
 
 // ==== Cassette UI ====
 function renderCassettes() {
@@ -296,6 +315,12 @@ function triggerFault() {
 
 function setupControls() {
     setupButton('btn-swap', () => {
+        // SECURITY INTERLOCK: ADMIN (Operator) cannot engage Change Orders
+        if (document.body.dataset.role === 'operator') {
+            returnToLogin();
+            return;
+        }
+
         if (!isChangeOrderActive) {
             // ENTER Mode
             isChangeOrderActive = true;
