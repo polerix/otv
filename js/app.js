@@ -371,10 +371,6 @@ function setupControls() {
         renderCassettes();
     });
 
-    setupButton('btn-swap-control', () => {
-        document.getElementById('library-modal').classList.remove('hidden');
-        // Note: initLibraryModal handles currentCategory update
-    });
 }
 
 function setupButton(id, onClick) {
@@ -585,8 +581,11 @@ function initLibraryModal() {
     let selectedLibraryIndex = -1;
 
     // Button Triggers
-    // Removed btn-change (now btn-swap-control in setupControls)
-
+    setupButton('btn-swap-control', () => {
+        modal.classList.remove('hidden');
+        updateCategory('Movies');
+        searchInput.value = '';
+    });
     function updateCategory(cat) {
         currentCategory = cat;
         tabs.forEach(t => {
