@@ -578,6 +578,10 @@ body[data-role="advanced"] .btn-admin {
   z-index: 1000;
 }
 
+#control-panel.admin-collapsed .control-row {
+  display: none;
+}
+
 .control-row {
   display: flex;
   justify-content: center;

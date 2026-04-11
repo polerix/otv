@@ -39,7 +39,8 @@ const LIBRARY_DATABASE = [
 ];
 
 let selectedIndex = 0;
-let inFlightCassetteId = null; // Tracks which cassette is currently on the arm
+let inFlightCassetteId = null; 
+let isChangeOrderActive = false; // Tracks if we are in the "Change Order" configuration mode
 
 const CASSETTE_SVG = `<svg class="cassette-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 109.93 56.13">
   <defs>
@@ -251,6 +252,14 @@ function setupKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
         if (!document.getElementById('app-screen').classList.contains('active')) return;
 
+        // Numeric keys 1-8 for instant player alignment
+        const num = parseInt(e.key);
+        if (num >= 1 && num <= 8) {
+            selectedIndex = num - 1;
+            renderCassettes();
+            return;
+        }
+
         if (e.key === 'ArrowLeft') {
             selectedIndex = (selectedIndex - 1 + CASSETTES_COUNT) % CASSETTES_COUNT;
             renderCassettes();
@@ -279,33 +288,52 @@ function triggerFault() {
 }
 
 function setupControls() {
+    setupButton('btn-swap', () => {
+        if (!isChangeOrderActive) {
+            // ENTER Change Order Mode
+            isChangeOrderActive = true;
+            document.getElementById('control-panel').classList.remove('admin-collapsed');
+            document.getElementById('swap-label').innerText = 'ACTIVATE CHANGE ORDER';
+        } else {
+            // EXECUTE Change Order
+            runSwapSequence();
+        }
+    });
+
     setupButton('btn-play', () => {
         const cassette = cassettes[selectedIndex];
-        if (cassette.status === 'idle') {
+        // Resume currently loaded/active tape player
+        // For simulation, we assume clicking play starts the selected one if idle
+        if (cassette.label !== 'Empty') {
+            cassettes.forEach(c => { if(c.status === 'playing') c.status = 'idle'; });
             cassette.status = 'playing';
             renderCassettes();
         }
     });
 
-    setupButton('btn-pause', () => { });
+    setupButton('btn-pause', () => {
+        // Find whatever is on air and pause it
+        let onAirIndex = cassettes.findIndex(c => c.status === 'playing' || c.status === 'active');
+        if (onAirIndex !== -1) {
+            cassettes[onAirIndex].status = 'paused';
+            // Align robot to THIS player
+            selectedIndex = onAirIndex;
+            renderCassettes();
+        }
+    });
 
     setupButton('btn-stop', () => {
         const btnStop = document.getElementById('btn-stop');
         btnStop.classList.add('task-active');
         setTimeout(() => btnStop.classList.remove('task-active'), 2000);
 
-        const cassette = cassettes[selectedIndex];
-        if (cassette.status === 'active') {
-            triggerFault();
-        } else if (cassette.status === 'playing') {
-            cassette.status = 'idle';
-            syncButtonStates();
-            renderCassettes();
-        }
-    });
-
-    setupButton('btn-swap', () => {
-        runSwapSequence();
+        // Stop all playback on air
+        cassettes.forEach(c => {
+            if (c.status === 'playing' || c.status === 'active') {
+                c.status = 'idle';
+            }
+        });
+        renderCassettes();
     });
 }
 
@@ -487,6 +515,13 @@ async function runSwapSequence() {
 
     isAnimating = false;
     syncButtonStates();
+
+    // End Change Order Mode
+    setTimeout(() => {
+        isChangeOrderActive = false;
+        document.getElementById('control-panel').classList.add('admin-collapsed');
+        document.getElementById('swap-label').innerText = 'CHANGE ORDER';
+    }, 1000);
 }
 
 /**
