@@ -42,6 +42,7 @@ let selectedIndex = 0;
 let inFlightCassetteId = null; 
 let isChangeOrderActive = false;
 let isSwapStaged = false; // Tracks if a new library title is staged for swapion mode
+let stagedMedia = null; // Holds the library selection until the arm physically swaps it
 
 const CASSETTE_SVG = `<svg class="cassette-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 109.93 56.13">
   <defs>
@@ -405,6 +406,7 @@ let isAnimating = false;
 function cancelChangeOrder() {
     isChangeOrderActive = false;
     isSwapStaged = false;
+    stagedMedia = null;
     document.getElementById('control-panel').classList.add('admin-collapsed');
     const swapControl = document.getElementById('btn-swap-control');
     if (swapControl) swapControl.classList.remove('task-active');
@@ -503,6 +505,18 @@ async function runSwapSequence() {
         
         // Hand-off to Queue (if it's the bottom arm)
         if (arm.pick.id.includes('180')) {
+            // Apply the staged media just before the slot drops back into place
+            if (stagedMedia) {
+                cassettes[selectedIndex] = {
+                    ...cassettes[selectedIndex],
+                    label: stagedMedia.label,
+                    subLabel: stagedMedia.subLabel,
+                    duration: stagedMedia.duration,
+                    status: 'idle'
+                };
+                stagedMedia = null;
+            }
+            
             // Render the queue with the slot already in the 'lifted' (up) state
             renderCassettes(); 
             
@@ -652,17 +666,8 @@ function initLibraryModal() {
     selectBtn.addEventListener('click', () => {
         if (selectedLibraryIndex === -1) return;
         
-        const newMedia = LIBRARY_DATABASE[selectedLibraryIndex];
+        stagedMedia = LIBRARY_DATABASE[selectedLibraryIndex];
         
-        cassettes[selectedIndex] = {
-            ...cassettes[selectedIndex],
-            label: newMedia.label,
-            subLabel: newMedia.subLabel,
-            duration: newMedia.duration,
-            status: 'idle'
-        };
-
-        renderCassettes();
         modal.classList.add('hidden');
         
         // STAGE FOR SWAP
