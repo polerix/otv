@@ -40,7 +40,8 @@ const LIBRARY_DATABASE = [
 
 let selectedIndex = 0;
 let inFlightCassetteId = null; 
-let isChangeOrderActive = false; // Tracks if we are in the "Change Order" configuration mode
+let isChangeOrderActive = false;
+let isSwapStaged = false; // Tracks if a new library title is staged for swapion mode
 
 const CASSETTE_SVG = `<svg class="cassette-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 109.93 56.13">
   <defs>
@@ -252,6 +253,12 @@ function setupKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
         if (!document.getElementById('app-screen').classList.contains('active')) return;
 
+        // Escape to cancel change order
+        if (e.key === 'Escape') {
+            if (isChangeOrderActive) cancelChangeOrder();
+            return;
+        }
+
         // Numeric keys 1-8 for instant player alignment
         const num = parseInt(e.key);
         if (num >= 1 && num <= 8) {
@@ -290,13 +297,16 @@ function triggerFault() {
 function setupControls() {
     setupButton('btn-swap', () => {
         if (!isChangeOrderActive) {
-            // ENTER Change Order Mode
+            // ENTER Mode
             isChangeOrderActive = true;
             document.getElementById('control-panel').classList.remove('admin-collapsed');
-            document.getElementById('swap-label').innerText = 'ACTIVATE CHANGE ORDER';
         } else {
-            // EXECUTE Change Order
-            runSwapSequence();
+            // If staged, EXECUTE. If not staged, ESCAPE.
+            if (isSwapStaged) {
+                runSwapSequence();
+            } else {
+                cancelChangeOrder();
+            }
         }
     });
 
@@ -335,6 +345,11 @@ function setupControls() {
         });
         renderCassettes();
     });
+
+    setupButton('btn-swap-control', () => {
+        document.getElementById('library-modal').classList.remove('hidden');
+        // Note: initLibraryModal handles currentCategory update
+    });
 }
 
 function setupButton(id, onClick) {
@@ -363,6 +378,14 @@ function setupButton(id, onClick) {
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 let isAnimating = false;
+
+function cancelChangeOrder() {
+    isChangeOrderActive = false;
+    isSwapStaged = false;
+    document.getElementById('control-panel').classList.add('admin-collapsed');
+    const swapControl = document.getElementById('btn-swap-control');
+    if (swapControl) swapControl.classList.remove('task-active');
+}
 
 async function runSwapSequence() {
     if (isAnimating) return;
@@ -518,9 +541,7 @@ async function runSwapSequence() {
 
     // End Change Order Mode
     setTimeout(() => {
-        isChangeOrderActive = false;
-        document.getElementById('control-panel').classList.add('admin-collapsed');
-        document.getElementById('swap-label').innerText = 'CHANGE ORDER';
+        cancelChangeOrder();
     }, 1000);
 }
 
@@ -539,11 +560,7 @@ function initLibraryModal() {
     let selectedLibraryIndex = -1;
 
     // Button Triggers
-    setupButton('btn-change', () => {
-        modal.classList.remove('hidden');
-        updateCategory('Movies');
-        searchInput.value = '';
-    });
+    // Removed btn-change (now btn-swap-control in setupControls)
 
     function updateCategory(cat) {
         currentCategory = cat;
@@ -622,9 +639,10 @@ function initLibraryModal() {
         renderCassettes();
         modal.classList.add('hidden');
         
-        const btnSwap = document.getElementById('btn-swap');
-        btnSwap.classList.add('task-active');
-        setTimeout(() => btnSwap.classList.remove('task-active'), 5000);
+        // STAGE FOR SWAP
+        isSwapStaged = true;
+        const btnSwapControl = document.getElementById('btn-swap-control');
+        if (btnSwapControl) btnSwapControl.classList.add('task-active');
     });
 }
 
